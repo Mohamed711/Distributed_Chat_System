@@ -92,7 +92,7 @@ class ClientHandler extends Thread
             System.out.println(e.getMessage());
         }
     }   
-}  
+}
 
 public class Chat_System_Server 
 {  
@@ -100,6 +100,8 @@ public class Chat_System_Server
     {
         //Create main server socket
         ServerSocket server = new ServerSocket(1234);
+        //run UI and adminstrator
+        (new UI_Admin()).start();
         while(true)
         {
             //listen for clients
