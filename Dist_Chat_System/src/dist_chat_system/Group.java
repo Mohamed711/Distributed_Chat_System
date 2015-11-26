@@ -3,8 +3,12 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package chat_system_server;
+package dist_chat_system;
 
+/**
+ *
+ * @author Fakheraldin
+ */
 import java.util.TreeMap;
 
 /**
@@ -25,5 +29,21 @@ public class Group
 
     public void setName(String name) {
         this.name = name;
+    }
+    
+    public void addClient(Client newClient) {
+        clients.put(newClient.getName(), newClient);
+    }
+    
+    public void removeClient(Client trmvClient) {
+        clients.remove(trmvClient.getName());
+    }
+
+    public TreeMap<String, Client> getClients() {
+        return clients;
+    }
+
+    public void setClients(TreeMap<String, Client> clients) {
+        this.clients = clients;
     }
 }

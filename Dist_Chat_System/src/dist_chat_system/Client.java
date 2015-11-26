@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package chat_system_server;
+package dist_chat_system;
 
 import java.util.TreeMap;
 
@@ -66,5 +66,9 @@ public class Client
 
     public void setGroups(TreeMap<String, Group> groups) {
         this.groups = groups;
+    }
+    
+    public void addGroup(Group newGroup) {
+        groups.put(newGroup.getName(), newGroup);
     }
 }
