@@ -104,6 +104,11 @@ public class ClientHandler extends Thread
                                 stringBuilder.append(cValue.getName()+","+cValue.getIp()+","+cValue.getPortNo()+","+Boolean.toString(cValue.isStatus())+"\r\n");
                             }
                         }
+                        //if there is no clients or only the current client
+                        if(GlobalVariables.clients.size()<=1)
+                        {
+                            stringBuilder.append("empty"+"\r\n");
+                        }
                         //another new line so now we can enter us groups' names
                         stringBuilder.append("\r\n");
                         //loop on current user's groups
@@ -119,6 +124,10 @@ public class ClientHandler extends Thread
                             {
                                 stringBuilder.append(gValue.getName()+","+Boolean.toString(false)+"\r\n");
                             }
+                        }
+                        if(GlobalVariables.groups.isEmpty())
+                        {
+                            stringBuilder.append("empty"+"\r\n");
                         }
                         //indicate end of message by adding new line
                         stringBuilder.append("\r\n");
