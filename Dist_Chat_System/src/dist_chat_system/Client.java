@@ -69,6 +69,6 @@ public class Client
     }
     
     public void addGroup(Group newGroup) {
-        groups.put(newGroup.getName(), newGroup);
+        this.groups.put(newGroup.getName(), newGroup);
     }
 }

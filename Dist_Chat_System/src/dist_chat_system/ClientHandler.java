@@ -22,9 +22,11 @@ public class ClientHandler extends Thread
     private boolean update_flag;
     private Client currentClient;
     private  boolean thread_close;
+    private gui mainGui;
     // constructor
-    public ClientHandler(Socket client) 
+    public ClientHandler(Socket client, gui mainGui) 
     {
+        this.mainGui=mainGui;
         this.clientSocket = client;
         update_flag = false;
         update_msg = new String("");
@@ -47,6 +49,7 @@ public class ClientHandler extends Thread
                 {
                     if(update_flag)
                     {
+                        System.out.println(update_msg);
                         dos.writeUTF(update_msg);
                         update_flag = false;
                     } 
@@ -77,6 +80,7 @@ public class ClientHandler extends Thread
                         if(this.currentClient.isStatus())//online
                         {
                             onFlag = true;
+                            System.out.println("you are online");
                             dos.writeUTF("you are online");
                         }
                         else
@@ -90,6 +94,7 @@ public class ClientHandler extends Thread
                     {
                         GlobalVariables.clients.put(name, new Client(name,iP,portNo,true));
                         this.currentClient = GlobalVariables.clients.get(name);
+                        mainGui.add(name);
                     }
                     if(!onFlag)
                     {
@@ -112,17 +117,17 @@ public class ClientHandler extends Thread
                         //another new line so now we can enter us groups' names
                         stringBuilder.append("\r\n");
                         //loop on current user's groups
-                        for(Map.Entry<String,Group> entry : this.currentClient.getGroups().entrySet()) 
+                        for(Map.Entry<String,Group> entry : GlobalVariables.groups.entrySet()) 
                         {
                             //each group is entered in a line
                             Group gValue = entry.getValue();
                             if(this.currentClient.getGroups().containsKey(gValue.getName()))
                             {
-                                stringBuilder.append(gValue.getName()+","+Boolean.toString(true)+"\r\n");
+                                stringBuilder.append(gValue.getName()+","+"true"+"\r\n");
                             }
                             else
                             {
-                                stringBuilder.append(gValue.getName()+","+Boolean.toString(false)+"\r\n");
+                                stringBuilder.append(gValue.getName()+","+"false"+"\r\n");
                             }
                         }
                         if(GlobalVariables.groups.isEmpty())
@@ -133,6 +138,7 @@ public class ClientHandler extends Thread
                         stringBuilder.append("\r\n");
                         System.out.println(stringBuilder.toString());
                         dos.writeUTF(stringBuilder.toString());
+                        gui.updateAllUsers_signIn(this.getId(), name, portNo, iP);
                     }
                 }
                 else if(header.equals("create_grp"))
@@ -140,6 +146,7 @@ public class ClientHandler extends Thread
                     String groupName = msgFields[1];
                     if (GlobalVariables.groups.containsKey(groupName))
                     {
+                        System.out.println("group name exists");
                         dos.writeUTF("group name exists");        
                     }
                     else
@@ -147,9 +154,11 @@ public class ClientHandler extends Thread
                         Group newGroup = new Group();
                         newGroup.setName(groupName);
                         GlobalVariables.groups.put(groupName, newGroup);
-                        newGroup.addClient(currentClient);
+                        newGroup.addClient(this.currentClient);
                         this.currentClient.addGroup(newGroup);
+                        System.out.println("created_successfully");
                         dos.writeUTF("created_successfully");
+                        gui.updateAllUsers_createGroup(groupName, this.getId());
                     }  
                 }
                 else if(header.equals("enroll_grp"))
@@ -167,6 +176,9 @@ public class ClientHandler extends Thread
                 else if(header.equals("grp_msg"))
                 {
                     String grpName = msgFields[1];
+                    String msg = msgFields[2];
+                    
+                    gui.updateAllUsers_groupMsg(grpName, msg, this.getId(), this.currentClient.getName());
                 }
                 else if(header.equals("open_grp"))
                 {
@@ -179,11 +191,13 @@ public class ClientHandler extends Thread
                         s.append(cValue.getName()+",");
                         String sOut = s.toString();
                         sOut = sOut.substring(0, sOut.length()-1);
+                        System.out.println(sOut);
                         dos.writeUTF(sOut);
                     }           
                 }
                 else if(header.equals("sign_out"))
                 {
+                   this.currentClient.setStatus(false);
                    gui.updateAllUsers_signOut(this.getId(),this.currentClient.getName());
                    break;
                 }
@@ -195,7 +209,8 @@ public class ClientHandler extends Thread
         } 
         catch (Exception e) 
         {
-            System.out.println("kharag ebn el eeih");
+            this.currentClient.setStatus(false);
+            System.out.println("kharag el client :D");
             System.out.println(e.getMessage());
         }
     }  

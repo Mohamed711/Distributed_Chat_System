@@ -20,7 +20,9 @@ public class Group
     private String name;
     private TreeMap < String,Client > clients; 
 
-    public Group() {
+    public Group() 
+    {
+        clients = new TreeMap < String,Client >();
     }
     
     public String getName() {
@@ -32,15 +34,15 @@ public class Group
     }
     
     public void addClient(Client newClient) {
-        clients.put(newClient.getName(), newClient);
+        this.clients.put(newClient.getName(), newClient);
     }
     
     public void removeClient(Client trmvClient) {
-        clients.remove(trmvClient.getName());
+        this.clients.remove(trmvClient.getName());
     }
 
     public TreeMap<String, Client> getClients() {
-        return clients;
+        return this.clients;
     }
 
     public void setClients(TreeMap<String, Client> clients) {

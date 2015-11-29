@@ -18,7 +18,7 @@ public class gui extends javax.swing.JFrame
         initComponents();
     }
     
-    private void add(String name)
+    public void add(String name)
     {
         jList1.setModel(dm);
         dm.addElement(name);     
@@ -136,7 +136,20 @@ public class gui extends javax.swing.JFrame
         delete(indexDelete);
         updateAllUsers_delete(selectedUser);
     }//GEN-LAST:event_deleteClientButtonActionPerformed
-
+    
+    public static void updateAllUsers_signIn(Long id, String userName, String portNo, String Ip)
+    {
+        for(Map.Entry<Long,ClientHandler> entry : GlobalVariables.threads.entrySet()) 
+        {
+            ClientHandler cHValue = entry.getValue();   
+            if(cHValue.getId()!=id)
+            {
+                cHValue.setUpdate_flag(true);
+                cHValue.setUpdate_msg("status"+","+userName+","+Ip+","+portNo+","+"true");
+            }
+        }
+    }
+    
     public static void updateAllUsers_signOut(Long id,String userName)
     {
         for(Map.Entry<Long,ClientHandler> entry : GlobalVariables.threads.entrySet()) 
@@ -151,6 +164,37 @@ public class gui extends javax.swing.JFrame
         GlobalVariables.threads.remove(id);
     }
     
+    public static void updateAllUsers_groupMsg(String groupName, String msg, long userId, String userName)
+    {
+        for(Map.Entry<Long,ClientHandler> entry : GlobalVariables.threads.entrySet()) 
+        {
+            ClientHandler cHValue = entry.getValue();   
+            
+            if(cHValue.getId()!= userId)
+            {
+                if(cHValue.getCurrentClient().getGroups().containsKey(groupName))
+                {
+                    cHValue.setUpdate_flag(true);
+                    cHValue.setUpdate_msg("grp_msg"+groupName+userName+msg);
+                }
+            }
+        }
+    }
+    
+    public static void updateAllUsers_createGroup(String groupName,Long userId)
+    {
+        for(Map.Entry<Long,ClientHandler> entry : GlobalVariables.threads.entrySet()) 
+        {
+            ClientHandler cHValue = entry.getValue();   
+            
+            if(cHValue.getId()!= userId)
+            {               
+                cHValue.setUpdate_flag(true);
+                cHValue.setUpdate_msg("create_grp"+","+groupName);               
+            }
+        }
+    }
+    
     public static void updateAllUsers_delete(String userName)
     {
         long trmvId = 0;
@@ -160,7 +204,6 @@ public class gui extends javax.swing.JFrame
             Group gRValue = entry.getValue();   
             gRValue.removeClient(trmvClient);
         }
-        GlobalVariables.clients.remove(userName);
         for(Map.Entry<Long,ClientHandler> entry : GlobalVariables.threads.entrySet()) 
         {
             ClientHandler cHValue = entry.getValue();   
@@ -170,17 +213,17 @@ public class gui extends javax.swing.JFrame
                 break;
             }
         }
-        
-        ClientHandler trmvThread = GlobalVariables.threads.get(trmvId);
-        GlobalVariables.threads.remove(trmvId);
-        trmvThread.setThread_close(true);
-        
         for(Map.Entry<Long,ClientHandler> entry : GlobalVariables.threads.entrySet()) 
         {
             ClientHandler cHValue = entry.getValue();   
             cHValue.setUpdate_flag(true);
             cHValue.setUpdate_msg("delete"+","+userName);
         }
+        GlobalVariables.clients.remove(userName);
+        ClientHandler trmvThread = GlobalVariables.threads.get(trmvId);
+        GlobalVariables.threads.remove(trmvId);
+        trmvThread.setThread_close(true);
+        
     }
     
     public static void main(String args[]) throws IOException 
@@ -208,15 +251,9 @@ public class gui extends javax.swing.JFrame
         }
         //</editor-fold>
 
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() 
-        {
-            public void run() {
-                gui mainGui = new gui();
-                mainGui.setVisible(true);
-            }
-        });
-        
+        gui mainGui = new gui();
+        mainGui.setVisible(true);
+
         //Create main server socket
         ServerSocket server = new ServerSocket(1234);
         while(true)
@@ -226,7 +263,7 @@ public class gui extends javax.swing.JFrame
             //listen for clients
             Socket client = server.accept();
             //create new thread to serve each client
-            ClientHandler incomming = new ClientHandler(client);
+            ClientHandler incomming = new ClientHandler(client,mainGui);
             GlobalVariables.threads.put(incomming.getId(),incomming);
             incomming.start();
         }
