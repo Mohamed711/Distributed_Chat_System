@@ -25,6 +25,12 @@ public class Group
         clients = new TreeMap < String,Client >();
     }
     
+    public Group(String name)
+    {
+        clients = new TreeMap < String,Client >();
+        this.name = name;
+    }
+    
     public String getName() {
         return name;
     }

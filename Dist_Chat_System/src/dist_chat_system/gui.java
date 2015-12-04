@@ -24,6 +24,26 @@ public class gui extends javax.swing.JFrame
         dm.addElement(name);     
     }
     
+    public void updateUserStatus(boolean newStatus, String userName)
+    {
+        jList1.setModel(dm);       
+        if (newStatus == true)
+        {
+            String userStatus = userName + "      online";
+            String oldUserStatus = userName + "      offline";
+            int index = dm.indexOf(oldUserStatus);
+            dm.remove(index);
+            dm.add(index, userStatus);
+        }
+        else
+        {   String oldUserStatus = userName + "      online";
+            String userStatus = userName + "      offline";
+            int index = dm.indexOf(oldUserStatus);
+            dm.remove(index);
+            dm.add(index, userStatus);
+        }
+    }
+    
     private void delete(int index)
     { 
         jList1.setModel(dm);
@@ -36,9 +56,8 @@ public class gui extends javax.swing.JFrame
 
         jScrollPane1 = new javax.swing.JScrollPane();
         jList1 = new javax.swing.JList<String>();
-        refreshButton = new javax.swing.JButton();
-        clearClientButton = new javax.swing.JButton();
         deleteClientButton = new javax.swing.JButton();
+        jLabel1 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -49,20 +68,6 @@ public class gui extends javax.swing.JFrame
         });
         jScrollPane1.setViewportView(jList1);
 
-        refreshButton.setText("Refresh");
-        refreshButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                refreshButtonActionPerformed(evt);
-            }
-        });
-
-        clearClientButton.setText("Clear");
-        clearClientButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                clearClientButtonActionPerformed(evt);
-            }
-        });
-
         deleteClientButton.setText("Delete");
         deleteClientButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -70,71 +75,56 @@ public class gui extends javax.swing.JFrame
             }
         });
 
+        jLabel1.setText("Users List");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(34, 34, 34)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 189, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 43, Short.MAX_VALUE)
-                        .addComponent(deleteClientButton)
-                        .addGap(43, 43, 43)
-                        .addComponent(clearClientButton, javax.swing.GroupLayout.PREFERRED_SIZE, 66, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(59, 59, 59))
+                        .addGap(34, 34, 34)
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 189, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(layout.createSequentialGroup()
                         .addGap(93, 93, 93)
-                        .addComponent(refreshButton)
-                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                        .addComponent(deleteClientButton))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(106, 106, 106)
+                        .addComponent(jLabel1)))
+                .addContainerGap(35, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(52, 52, 52)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(42, 42, 42)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(deleteClientButton)
-                            .addComponent(clearClientButton))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(refreshButton))
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(118, Short.MAX_VALUE))
+                .addGap(6, 6, 6)
+                .addComponent(jLabel1)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 214, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(deleteClientButton)
+                .addGap(26, 26, 26))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
-
-    private void refreshButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_refreshButtonActionPerformed
-        dm.clear();
-        jList1.setModel(dm);
-        for(Map.Entry<String,Client> entry : GlobalVariables.clients.entrySet()) 
-        {
-            Client client = entry.getValue();
-            add(client.getName());
-        }
-    }//GEN-LAST:event_refreshButtonActionPerformed
-
-    private void clearClientButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_clearClientButtonActionPerformed
-
-        dm.clear();
-        jList1.setModel(dm);
-    }//GEN-LAST:event_clearClientButtonActionPerformed
 
     private void jList1ValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_jList1ValueChanged
         // TODO add your handling code here:
         String selected = jList1.getSelectedValue();
     }//GEN-LAST:event_jList1ValueChanged
 
+            
     private void deleteClientButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deleteClientButtonActionPerformed
-        int indexDelete;
-        String selectedUser = jList1.getSelectedValue();
-        indexDelete = jList1.getSelectedIndex();
-        delete(indexDelete);
-        updateAllUsers_delete(selectedUser);
+        int indexDelete = jList1.getSelectedIndex();
+        if(indexDelete != -1) // to handle case of non selected element
+        {
+            String selectedUser = jList1.getSelectedValue();
+            String[] splitted = selectedUser.split("\\s+");
+            selectedUser = splitted[0];
+            delete(indexDelete);
+            updateAllUsers_delete(selectedUser);
+        }
     }//GEN-LAST:event_deleteClientButtonActionPerformed
     
     public static void updateAllUsers_signIn(Long id, String userName, String portNo, String Ip)
@@ -175,7 +165,7 @@ public class gui extends javax.swing.JFrame
                 if(cHValue.getCurrentClient().getGroups().containsKey(groupName))
                 {
                     cHValue.setUpdate_flag(true);
-                    cHValue.setUpdate_msg("grp_msg"+groupName+userName+msg);
+                    cHValue.setUpdate_msg("grp_msg"+","+groupName+","+userName+","+msg);
                 }
             }
         }
@@ -195,6 +185,16 @@ public class gui extends javax.swing.JFrame
         }
     }
     
+    public static void updateAllUsers_deleteGroup(String groupName)
+    {
+        for(Map.Entry<Long,ClientHandler> entry : GlobalVariables.threads.entrySet()) 
+        {
+            ClientHandler cHValue = entry.getValue();                  
+            cHValue.setUpdate_flag(true);
+            cHValue.setUpdate_msg("delete_grp"+","+groupName);               
+        }
+    }
+    
     public static void updateAllUsers_delete(String userName)
     {
         long trmvId = 0;
@@ -203,6 +203,12 @@ public class gui extends javax.swing.JFrame
         {
             Group gRValue = entry.getValue();   
             gRValue.removeClient(trmvClient);
+            //if the user was the last member in the group remove this group
+            if(gRValue.getClients().size()==0)
+            {
+                GlobalVariables.groups.remove(gRValue.getName());
+                updateAllUsers_deleteGroup(gRValue.getName());
+            }
         }
         for(Map.Entry<Long,ClientHandler> entry : GlobalVariables.threads.entrySet()) 
         {
@@ -222,8 +228,11 @@ public class gui extends javax.swing.JFrame
         GlobalVariables.clients.remove(userName);
         ClientHandler trmvThread = GlobalVariables.threads.get(trmvId);
         GlobalVariables.threads.remove(trmvId);
-        trmvThread.setThread_close(true);
-        
+        if(trmvThread!=null)
+        {
+            trmvThread.setThread_close(true);
+    
+        }
     }
     
     public static void main(String args[]) throws IOException 
@@ -253,7 +262,28 @@ public class gui extends javax.swing.JFrame
 
         gui mainGui = new gui();
         mainGui.setVisible(true);
-
+        
+        ////////// dummy clients our names
+        GlobalVariables.clients.put("Fakhr",new Client("Fakhr","","",false));
+        mainGui.add("Fakhr      offline");
+        GlobalVariables.clients.put("Hesham",new Client("Hesham","","",false));
+        mainGui.add("Hesham      offline");
+        GlobalVariables.clients.put("Farida",new Client("Farida","","",false));
+        mainGui.add("Farida      offline");
+        GlobalVariables.clients.put("Arwa",new Client("Arwa","","",false));
+        mainGui.add("Arwa      offline");
+        GlobalVariables.clients.put("Amr",new Client("Amr","","",false));
+        mainGui.add("Amr      offline");
+        GlobalVariables.clients.put("Abbas",new Client("Abbas","","",false));
+        mainGui.add("Abbas      offline");
+        GlobalVariables.groups.put("MainGroup",new Group("MainGroup"));
+        for(Map.Entry<String,Client> entry : GlobalVariables.clients.entrySet()) 
+        {
+            Client cValue = entry.getValue();   
+            GlobalVariables.groups.get("MainGroup").addClient(cValue);
+            cValue.addGroup(GlobalVariables.groups.get("MainGroup"));
+        }
+        //////////
         //Create main server socket
         ServerSocket server = new ServerSocket(1234);
         while(true)
@@ -270,10 +300,9 @@ public class gui extends javax.swing.JFrame
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton clearClientButton;
     private javax.swing.JButton deleteClientButton;
+    private javax.swing.JLabel jLabel1;
     private javax.swing.JList<String> jList1;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JButton refreshButton;
     // End of variables declaration//GEN-END:variables
 }
